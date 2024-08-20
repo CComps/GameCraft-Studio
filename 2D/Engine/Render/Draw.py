@@ -9,15 +9,29 @@ class Draw:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    def draw_rect(self, color, rect):
-        """Draw a rectangle using OpenGL."""
+    def draw_rect(self, color, rect, filled=True, line_width=1):
+        """Draw a rectangle using OpenGL. If 'filled' is False, only the outline is drawn with specified line width."""
         glColor4f(color[0] / 255, color[1] / 255, color[2] / 255, 1)
-        glBegin(GL_QUADS)
+
+        if filled:
+            glBegin(GL_QUADS)  # Draw filled rectangle
+        else:
+            current_line_width = glGetFloatv(
+                GL_LINE_WIDTH
+            )  # Save the current line width
+            glLineWidth(line_width)  # Set the line width for the outline
+            glBegin(GL_LINE_LOOP)  # Draw only the outline
+
         glVertex2f(rect[0], rect[1])
         glVertex2f(rect[0] + rect[2], rect[1])
         glVertex2f(rect[0] + rect[2], rect[1] + rect[3])
         glVertex2f(rect[0], rect[1] + rect[3])
         glEnd()
+
+        if not filled:
+            glLineWidth(
+                current_line_width
+            )  # Reset the line width to its previous value
 
     def draw_circle(self, color, center, radius):
         """Draw a circle using OpenGL."""

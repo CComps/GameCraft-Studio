@@ -129,6 +129,8 @@ class Main:
                             self.grid.grid_size,
                             self.grid.grid_size,
                         ),
+                        filled=False,
+                        line_width=3,
                     )
             else:
                 if self.active_cell != None:
@@ -140,6 +142,8 @@ class Main:
                             self.grid.grid_size,
                             self.grid.grid_size,
                         ),
+                        filled=False,
+                        line_width=3,
                     )
 
             pygame.display.flip()

@@ -3,7 +3,9 @@ from OpenGL.GL import *
 
 
 class Grid:
-    def __init__(self, screen, grid_size=32, color=(200, 200, 200)):
+    def __init__(
+        self, screen, grid_size=16, color=(200, 200, 200)
+    ):  # grid_size reduced to 16
         """
         Initialize the grid.
 
@@ -15,6 +17,7 @@ class Grid:
         self.screen = screen
         self.grid_size = grid_size
         self.color = color
+        self.snap_size = grid_size * 2
 
     def render(self):
         """Render the grid on the screen."""
@@ -38,6 +41,6 @@ class Grid:
         Returns:
         - A tuple (snapped_x, snapped_y) representing the snapped position.
         """
-        x = round(pos[0] / self.grid_size) * self.grid_size
-        y = round(pos[1] / self.grid_size) * self.grid_size
+        x = round(pos[0] / self.snap_size) * self.snap_size
+        y = round(pos[1] / self.snap_size) * self.snap_size
         return (x, y)
