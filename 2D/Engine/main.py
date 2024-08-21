@@ -2,6 +2,7 @@ import pygame
 from Render import Render
 from Render.Grid import Grid  # Import the Grid class
 from OpenGL.GL import *
+from UI.ui_manager import UIManager  # Import the UIManager class
 
 
 class Main:
@@ -27,6 +28,7 @@ class Main:
 
         self.render = Render(self.screen)
         self.grid = Grid(self.screen, grid_size=32)  # Initialize the Grid
+        self.ui_manager = UIManager(self)  # Initialize the UIManager with reference to Main
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -35,7 +37,7 @@ class Main:
         x_mouse, y_mouse = pygame.mouse.get_pos()
         if self.Grid_Snapping and select:
             if self.selected_cells != []:
-                if shift == False:
+                if not shift:
                     self.selected_cells = []
             x_mouse += -15
             y_mouse += -15
@@ -55,7 +57,7 @@ class Main:
             )
         elif select:
             if self.selected_cells != []:
-                if shift == False:
+                if not shift:
                     self.selected_cells = []
             x_mouse += -15
             y_mouse += -15
@@ -82,16 +84,9 @@ class Main:
                 elif event.key == pygame.K_g:
                     self.Grid_Snapping = not self.Grid_Snapping
 
-                elif (
-                    pygame.key.get_mods() & pygame.KMOD_LSHIFT
-                    and event.type != pygame.MOUSEBUTTONDOWN
-                ):
-                    self.selected_cells = []
-                    self.selected_cells.append(self.active_cell)
-
+            # Handle mouse events
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
-                    # Get the snapped position of the mouse click
                     data_from_mouse = self.get_mouse_pos(select=True, shift=shift_held)
                     self.active_cell = data_from_mouse[1]
                     mouse_pos = data_from_mouse[0]
@@ -99,8 +94,11 @@ class Main:
                 elif event.button == 2:  # Middle Mouse click
                     pass
 
-                elif event.button == 3:  # Right Mouse click
-                    pass
+                elif event.button == 3:  # Right click
+                    self.ui_manager.show_menu(pygame.mouse.get_pos())
+
+            # Handle the UIManager events
+            self.ui_manager.handle_event(event)
 
     def run(self):
         while self.running:
@@ -119,7 +117,7 @@ class Main:
             mouse_pos = data_from_mouse[0]
 
             # Draw the selected cell in yellow
-            if self.selected_cells != []:
+            if self.selected_cells:
                 for self.selected_cell in self.selected_cells:
                     self.render.draw.draw_rect(
                         (255, 255, 0),  # Yellow color
@@ -133,7 +131,7 @@ class Main:
                         line_width=3,
                     )
             else:
-                if self.active_cell != None:
+                if self.active_cell is not None:
                     self.render.draw.draw_rect(
                         (255, 255, 0),  # Yellow color
                         (
@@ -146,10 +144,14 @@ class Main:
                         line_width=3,
                     )
 
+            # Render the UI elements
+            self.ui_manager.render()
+
             pygame.display.flip()
             self.clock.tick(60)
 
         pygame.quit()
+        self.ui_manager.cleanup()  # Clean up Dear PyGui context
 
 
 if __name__ == "__main__":
